@@ -19,6 +19,7 @@ try
     using var scope = app.Services.CreateScope();
     var context = scope.ServiceProvider.GetRequiredService<DataContext>();
     await context.Database.MigrateAsync();
+    Seeder.SeedData(context);
 }
 catch (Exception ex)
 {
