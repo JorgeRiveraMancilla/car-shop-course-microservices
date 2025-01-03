@@ -62,5 +62,29 @@ namespace AuctionService.Controllers
                 mapper.Map<AuctionDto>(auction)
             );
         }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateAuction(Guid id, UpdateAuctionDto updateAuctionDto)
+        {
+            var auction = await _dataContext
+                .Auctions.Include(x => x.Item)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (auction == null)
+                return NotFound();
+
+            // TODO: Check if the authenticated user is the seller
+
+            auction.Item.Make = updateAuctionDto.Make ?? auction.Item.Make;
+            auction.Item.Model = updateAuctionDto.Model ?? auction.Item.Model;
+            auction.Item.Color = updateAuctionDto.Color ?? auction.Item.Color;
+            auction.Item.Mileage = updateAuctionDto.Mileage ?? auction.Item.Mileage;
+            auction.Item.Year = updateAuctionDto.Year ?? auction.Item.Year;
+
+            if (0 < await _dataContext.SaveChangesAsync())
+                return Ok();
+
+            return BadRequest("Problem saving changes");
+        }
     }
 }
