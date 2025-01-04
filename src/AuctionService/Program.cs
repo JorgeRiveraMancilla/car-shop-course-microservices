@@ -14,7 +14,7 @@ builder.Services.AddMassTransit(x =>
 {
     x.AddEntityFrameworkOutbox<DataContext>(o =>
     {
-        o.QueryDelay = TimeSpan.FromMilliseconds(10);
+        o.QueryDelay = TimeSpan.FromSeconds(10);
         o.UsePostgres();
         o.UseBusOutbox();
     });
@@ -24,6 +24,15 @@ builder.Services.AddMassTransit(x =>
     x.UsingRabbitMq(
         (context, configuration) =>
         {
+            configuration.Host(
+                "localhost",
+                "/",
+                h =>
+                {
+                    h.Username("rabbitmq");
+                    h.Password("rabbitmq");
+                }
+            );
             configuration.ConfigureEndpoints(context);
         }
     );
