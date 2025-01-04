@@ -3,6 +3,8 @@ using AuctionService.DTOs;
 using AuctionService.Entities;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Contracts;
+using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,10 +12,15 @@ namespace AuctionService.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuctionController(DataContext dataContext, IMapper mapper) : ControllerBase
+    public class AuctionController(
+        DataContext dataContext,
+        IMapper mapper,
+        IPublishEndpoint publishEndpoint
+    ) : ControllerBase
     {
         private readonly DataContext _dataContext = dataContext;
         private readonly IMapper _mapper = mapper;
+        private readonly IPublishEndpoint _publishEndpoint = publishEndpoint;
 
         [HttpGet]
         public async Task<ActionResult<List<AuctionDto>>> GetAllAuctions(string? date)
@@ -52,13 +59,15 @@ namespace AuctionService.Controllers
             auction.Seller = "test";
 
             _dataContext.Auctions.Add(auction);
+            var newAuction = _mapper.Map<AuctionDto>(auction);
+
+            var auctionCreated = _mapper.Map<AuctionCreated>(newAuction);
+            await _publishEndpoint.Publish(auctionCreated);
 
             if (0 < await _dataContext.SaveChangesAsync())
-                return CreatedAtAction(
-                    nameof(GetAuctionById),
-                    new { auction.Id },
-                    _mapper.Map<AuctionDto>(auction)
-                );
+            {
+                return CreatedAtAction(nameof(GetAuctionById), new { auction.Id }, newAuction);
+            }
 
             return BadRequest("Problem saving changes");
         }
@@ -81,8 +90,13 @@ namespace AuctionService.Controllers
             auction.Item.Mileage = updateAuctionDto.Mileage ?? auction.Item.Mileage;
             auction.Item.Year = updateAuctionDto.Year ?? auction.Item.Year;
 
+            var auctionUpdated = _mapper.Map<AuctionUpdated>(auction);
+            await _publishEndpoint.Publish(auctionUpdated);
+
             if (0 < await _dataContext.SaveChangesAsync())
+            {
                 return Ok();
+            }
 
             return BadRequest("Problem saving changes");
         }
@@ -99,8 +113,13 @@ namespace AuctionService.Controllers
 
             _dataContext.Auctions.Remove(auction);
 
+            var auctionDeleted = new AuctionDeleted { Id = auction.Id.ToString() };
+            await _publishEndpoint.Publish(auctionDeleted);
+
             if (0 < await _dataContext.SaveChangesAsync())
+            {
                 return Ok();
+            }
 
             return BadRequest("Problem saving changes");
         }
