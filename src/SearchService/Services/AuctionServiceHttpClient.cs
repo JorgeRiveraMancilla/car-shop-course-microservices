@@ -16,7 +16,7 @@ namespace SearchService.Services
                 config["AuctionServiceUrl"]
                 ?? throw new ArgumentNullException("Cannot get auction address");
 
-            var url = auctionURL + "/api/auctions";
+            var url = auctionURL + "/api/auction";
 
             if (!string.IsNullOrEmpty(lastUpdated))
             {
