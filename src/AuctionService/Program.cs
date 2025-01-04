@@ -12,6 +12,15 @@ builder.Services.AddDbContext<DataContext>(opt =>
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddMassTransit(x =>
 {
+    x.AddEntityFrameworkOutbox<DataContext>(o =>
+    {
+        o.QueryDelay = TimeSpan.FromMilliseconds(10);
+        o.UsePostgres();
+        o.UseBusOutbox();
+    });
+
+    x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("auction", false));
+
     x.UsingRabbitMq(
         (context, configuration) =>
         {
