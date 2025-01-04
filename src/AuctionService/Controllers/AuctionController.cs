@@ -16,15 +16,17 @@ namespace AuctionService.Controllers
         private readonly IMapper _mapper = mapper;
 
         [HttpGet]
-        public async Task<ActionResult<List<AuctionDto>>> GetAllAuctions()
+        public async Task<ActionResult<List<AuctionDto>>> GetAllAuctions(string? date)
         {
-            var auctions = await _dataContext
-                .Auctions.Include(x => x.Item)
-                .OrderBy(x => x.Item.Make)
-                .ProjectTo<AuctionDto>(_mapper.ConfigurationProvider)
-                .ToListAsync();
+            var query = _dataContext.Auctions.OrderBy(x => x.Item.Make).AsQueryable();
 
-            return Ok(auctions);
+            if (!string.IsNullOrEmpty(date))
+            {
+                query = query.Where(x =>
+                    x.UpdatedAt.CompareTo(DateTime.Parse(date).ToUniversalTime()) > 0
+                );
+            }
+            return await query.ProjectTo<AuctionDto>(_mapper.ConfigurationProvider).ToListAsync();
         }
 
         [HttpGet("{id}")]
@@ -44,7 +46,7 @@ namespace AuctionService.Controllers
         [HttpPost]
         public async Task<ActionResult<AuctionDto>> CreateAuction(CreateAuctionDto createAuctionDto)
         {
-            var auction = mapper.Map<Auction>(createAuctionDto);
+            var auction = _mapper.Map<Auction>(createAuctionDto);
 
             // FIXME: This should be set to the authenticated user
             auction.Seller = "test";
@@ -55,7 +57,7 @@ namespace AuctionService.Controllers
                 return CreatedAtAction(
                     nameof(GetAuctionById),
                     new { auction.Id },
-                    mapper.Map<AuctionDto>(auction)
+                    _mapper.Map<AuctionDto>(auction)
                 );
 
             return BadRequest("Problem saving changes");
