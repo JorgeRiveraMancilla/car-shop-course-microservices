@@ -51,16 +51,14 @@ namespace AuctionService.Controllers
 
             _dataContext.Auctions.Add(auction);
 
-            var result = await _dataContext.SaveChangesAsync();
+            if (0 < await _dataContext.SaveChangesAsync())
+                return CreatedAtAction(
+                    nameof(GetAuctionById),
+                    new { auction.Id },
+                    mapper.Map<AuctionDto>(auction)
+                );
 
-            if (result == 0)
-                return BadRequest("Failed to create auction");
-
-            return CreatedAtAction(
-                nameof(GetAuctionById),
-                new { auction.Id },
-                mapper.Map<AuctionDto>(auction)
-            );
+            return BadRequest("Problem saving changes");
         }
 
         [HttpPut("{id}")]
@@ -80,6 +78,24 @@ namespace AuctionService.Controllers
             auction.Item.Color = updateAuctionDto.Color ?? auction.Item.Color;
             auction.Item.Mileage = updateAuctionDto.Mileage ?? auction.Item.Mileage;
             auction.Item.Year = updateAuctionDto.Year ?? auction.Item.Year;
+
+            if (0 < await _dataContext.SaveChangesAsync())
+                return Ok();
+
+            return BadRequest("Problem saving changes");
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteAuction(Guid id)
+        {
+            var auction = await _dataContext.Auctions.FindAsync(id);
+
+            if (auction == null)
+                return NotFound();
+
+            // TODO: Check if the authenticated user is the seller
+
+            _dataContext.Auctions.Remove(auction);
 
             if (0 < await _dataContext.SaveChangesAsync())
                 return Ok();
