@@ -5,17 +5,18 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgrespw
-      - POSTGRES_DB=auctions
+      - POSTGRES_DB=auction
     ports:
       - 5432:5432
     volumes:
       - /var/lib/postgresql/data
+
   mongodb:
+    container_name: search_db
     image: mongo
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=mongopw
+      - MONGO_INITDB_DATABASE=search
     ports:
-      - 27017:27017
-    volumes:
-      - /data/db
+      - "27018:27017"
