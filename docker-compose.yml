@@ -20,3 +20,15 @@ services:
       - MONGO_INITDB_DATABASE=search
     ports:
       - "27018:27017"
+    volumes:
+      - /var/lib/mongo/data
+  
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=rabbitmq
+      - RABBITMQ_DEFAULT_PASS=rabbitmq
