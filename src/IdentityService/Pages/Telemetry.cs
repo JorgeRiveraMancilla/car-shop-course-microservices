@@ -60,7 +60,7 @@ namespace IdentityService.Pages
             /// <summary>
             /// Meter for the IdentityService host project
             /// </summary>
-            private static readonly Meter Meter = new Meter(ServiceName, ServiceVersion);
+            private static readonly Meter Meter = new(ServiceName, ServiceVersion);
 
             private static readonly Counter<long> ConsentCounter = Meter.CreateCounter<long>(
                 Counters.Consent
