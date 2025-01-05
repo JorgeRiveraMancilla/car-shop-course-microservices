@@ -5,6 +5,7 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Contracts;
 using MassTransit;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -50,13 +51,13 @@ namespace AuctionService.Controllers
             return Ok(auction);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<AuctionDto>> CreateAuction(CreateAuctionDto createAuctionDto)
         {
             var auction = _mapper.Map<Auction>(createAuctionDto);
 
-            // FIXME: This should be set to the authenticated user
-            auction.Seller = "test";
+            auction.Seller = User.Identity!.Name!;
 
             _dataContext.Auctions.Add(auction);
             var newAuction = _mapper.Map<AuctionDto>(auction);
@@ -72,6 +73,7 @@ namespace AuctionService.Controllers
             return BadRequest("Problem saving changes");
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateAuction(Guid id, UpdateAuctionDto updateAuctionDto)
         {
@@ -82,7 +84,8 @@ namespace AuctionService.Controllers
             if (auction == null)
                 return NotFound();
 
-            // TODO: Check if the authenticated user is the seller
+            if (auction.Seller != User.Identity!.Name!)
+                return Forbid();
 
             auction.Item.Make = updateAuctionDto.Make ?? auction.Item.Make;
             auction.Item.Model = updateAuctionDto.Model ?? auction.Item.Model;
@@ -101,6 +104,7 @@ namespace AuctionService.Controllers
             return BadRequest("Problem saving changes");
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteAuction(Guid id)
         {
@@ -109,7 +113,8 @@ namespace AuctionService.Controllers
             if (auction == null)
                 return NotFound();
 
-            // TODO: Check if the authenticated user is the seller
+            if (auction.Seller != User.Identity!.Name!)
+                return Forbid();
 
             _dataContext.Auctions.Remove(auction);
 
