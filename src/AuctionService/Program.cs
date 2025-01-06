@@ -26,14 +26,20 @@ builder.Services.AddMassTransit(x =>
         (context, configuration) =>
         {
             configuration.Host(
-                "localhost",
+                builder.Configuration["RabbitMq:Host"],
                 "/",
                 h =>
                 {
-                    h.Username("rabbitmq");
-                    h.Password("rabbitmq");
+                    h.Username(builder.Configuration.GetValue("RabbitMq:Username", "guest")!);
+                    h.Password(builder.Configuration.GetValue("RabbitMq:Password", "guest")!);
                 }
             );
+
+            configuration.UseMessageRetry(r =>
+            {
+                r.Incremental(3, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(3));
+            });
+
             configuration.ConfigureEndpoints(context);
         }
     );
@@ -53,6 +59,9 @@ var app = builder.Build();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+var busControl = app.Services.GetRequiredService<IBusControl>();
+await busControl.StartAsync(new CancellationTokenSource(TimeSpan.FromMinutes(1)).Token);
 
 try
 {
