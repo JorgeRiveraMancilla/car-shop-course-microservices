@@ -48,6 +48,7 @@ services:
       retries: 10
 
   auction-service:
+    container_name: auction_service
     image: jiriveramancilla/auction-service:latest
     build:
       context: .
@@ -67,6 +68,7 @@ services:
         condition: service_healthy
 
   search-service:
+    container_name: search_service
     image: jiriveramancilla/search-service:latest
     build:
       context: .
@@ -88,6 +90,7 @@ services:
         condition: service_started
 
   identity-service:
+    container_name: identity_service
     image: jiriveramancilla/identity-service:latest
     build:
       context: .
@@ -103,6 +106,7 @@ services:
         condition: service_healthy
 
   gateway-service:
+    container_name: gateway_service
     image: jiriveramancilla/gateway-service:latest
     build:
       context: .
