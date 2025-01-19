@@ -27,12 +27,15 @@ namespace IdentityService
                     ClientName = "nextApp",
                     ClientSecrets = { new Secret("secret".Sha256()) },
                     AllowedGrantTypes = GrantTypes.CodeAndClientCredentials,
-                    RequirePkce = false,
+                    RequirePkce = true,
                     RedirectUris = { "http://localhost:3000/api/auth/callback/id-server" },
+                    PostLogoutRedirectUris = { "http://localhost:3000" },
                     AllowOfflineAccess = true,
                     AllowedScopes = { "openid", "profile", "auctionApp" },
                     AccessTokenLifetime = 3600 * 24 * 30,
                     AlwaysIncludeUserClaimsInIdToken = true,
+                    RequireClientSecret = true,
+                    AllowedCorsOrigins = { "http://localhost:3000" }
                 }
             ];
     }
