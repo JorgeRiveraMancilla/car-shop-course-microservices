@@ -1,3 +1,4 @@
+using Duende.IdentityServer.Configuration;
 using IdentityService.Data;
 using IdentityService.Models;
 using IdentityService.Services;
@@ -40,6 +41,15 @@ namespace IdentityService
             builder.Services.ConfigureApplicationCookie(options =>
             {
                 options.Cookie.SameSite = SameSiteMode.Lax;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+                options.SlidingExpiration = true;
+            });
+
+            builder.Services.Configure<IdentityServerOptions>(options =>
+            {
+                options.Authentication.CookieLifetime = TimeSpan.FromMinutes(30);
+                options.Authentication.CookieSlidingExpiration = true;
             });
 
             builder.Services.AddAuthentication();
