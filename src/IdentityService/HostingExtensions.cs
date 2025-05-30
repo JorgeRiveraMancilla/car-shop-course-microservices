@@ -23,6 +23,17 @@ namespace IdentityService
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy.WithOrigins("http://localhost:3000")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
+                });
+            });
+
             builder
                 .Services.AddIdentityServer(options =>
                 {
@@ -30,18 +41,27 @@ namespace IdentityService
                     options.Events.RaiseInformationEvents = true;
                     options.Events.RaiseFailureEvents = true;
                     options.Events.RaiseSuccessEvents = true;
-                    options.IssuerUri = "http://localhost:5000";
+                    options.IssuerUri = "http://localhost:5001";
                 })
                 .AddInMemoryIdentityResources(Config.IdentityResources)
                 .AddInMemoryApiScopes(Config.ApiScopes)
-                .AddInMemoryClients(Config.Clients)
+                .AddInMemoryClients(Config.GetClients(builder.Environment))
                 .AddAspNetIdentity<ApplicationUser>()
                 .AddProfileService<CustomProfileService>();
 
             builder.Services.ConfigureApplicationCookie(options =>
             {
                 options.Cookie.SameSite = SameSiteMode.Lax;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                
+                if (builder.Environment.IsProduction())
+                {
+                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                }
+                else
+                {
+                    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+                }
+                
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
                 options.SlidingExpiration = true;
             });
@@ -68,6 +88,9 @@ namespace IdentityService
 
             app.UseStaticFiles();
             app.UseRouting();
+            
+            app.UseCors();
+            
             app.UseIdentityServer();
             app.UseAuthorization();
 
