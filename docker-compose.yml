@@ -52,7 +52,7 @@ services:
     image: jiriveramancilla/auction-service:latest
     build:
       context: .
-      dockerfile: src/AuctionService/Dockerfile
+      dockerfile: Src/AuctionService/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
@@ -72,7 +72,7 @@ services:
     image: jiriveramancilla/search-service:latest
     build:
       context: .
-      dockerfile: src/SearchService/Dockerfile
+      dockerfile: Src/SearchService/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
@@ -94,7 +94,7 @@ services:
     image: jiriveramancilla/identity-service:latest
     build:
       context: .
-      dockerfile: src/IdentityService/Dockerfile
+      dockerfile: Src/IdentityService/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
       - ASPNETCORE_URLS=http://+:80
@@ -110,7 +110,7 @@ services:
     image: jiriveramancilla/gateway-service:latest
     build:
       context: .
-      dockerfile: src/GatewayService/Dockerfile
+      dockerfile: Src/GatewayService/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
       - ASPNETCORE_URLS=http://+:80

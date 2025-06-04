@@ -3,17 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C45A7C02-D5CB-480B-ADC9-5C3D194E4F5A}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Src", "Src", "{C45A7C02-D5CB-480B-ADC9-5C3D194E4F5A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionService", "src\AuctionService\AuctionService.csproj", "{4ACAFABA-B8A8-4A52-8A03-E383B0C57C81}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionService", "Src\AuctionService\AuctionService.csproj", "{4ACAFABA-B8A8-4A52-8A03-E383B0C57C81}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SearchService", "src\SearchService\SearchService.csproj", "{488B6CDE-2D23-4DFC-B94D-E5C33293237B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SearchService", "Src\SearchService\SearchService.csproj", "{488B6CDE-2D23-4DFC-B94D-E5C33293237B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "src\Contracts\Contracts.csproj", "{CAB3ABC4-EFF3-4917-933E-7E92287684D8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "Src\Contracts\Contracts.csproj", "{CAB3ABC4-EFF3-4917-933E-7E92287684D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityService", "src\IdentityService\IdentityService.csproj", "{C7C70151-9C14-4A84-B812-5D9D7D738431}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityService", "Src\IdentityService\IdentityService.csproj", "{C7C70151-9C14-4A84-B812-5D9D7D738431}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GatewayService", "src\GatewayService\GatewayService.csproj", "{A3A73692-6C8B-43E3-BDE1-396C370816B8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GatewayService", "Src\GatewayService\GatewayService.csproj", "{A3A73692-6C8B-43E3-BDE1-396C370816B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
