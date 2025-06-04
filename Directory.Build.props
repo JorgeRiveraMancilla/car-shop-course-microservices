@@ -5,13 +5,11 @@
     <WarningsNotAsErrors />
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    
     <!-- Análisis de código -->
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisLevel>latest</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
-
   <!-- Analyzers comunes para todos los proyectos -->
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0">
@@ -19,7 +17,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-  
   <!-- Configuración para proyectos web -->
   <PropertyGroup Condition="'$(IsWebProject)' == 'true'">
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
