@@ -1,0 +1,84 @@
+{
+   "tasks": [
+      {
+         "name": "format-staged-files",
+         "group": "pre-commit",
+         "command": "dotnet",
+         "args": [
+            "format",
+            "--include",
+            "${staged}"
+         ],
+         "include": [
+            "**/*.cs",
+            "**/*.vb"
+         ]
+      },
+      {
+         "name": "build-solution",
+         "group": "pre-commit",
+         "command": "dotnet",
+         "args": [
+            "build",
+            "--no-restore",
+            "--verbosity",
+            "minimal"
+         ]
+      },
+      {
+         "name": "restore-packages",
+         "group": "pre-commit",
+         "command": "dotnet",
+         "args": [
+            "restore"
+         ]
+      },
+      {
+         "name": "analyze-unused-files",
+         "group": "pre-push",
+         "command": "bash",
+         "args": [
+            "scripts/analyze-unused.sh"
+         ]
+      },
+      {
+         "name": "run-unit-tests",
+         "group": "pre-push",
+         "command": "dotnet",
+         "args": [
+            "test",
+            "--no-build",
+            "--verbosity",
+            "minimal"
+         ]
+      },
+      {
+         "name": "docker-compose-check",
+         "group": "pre-push",
+         "command": "docker-compose",
+         "args": [
+            "config",
+            "--quiet"
+         ]
+      },
+      {
+         "name": "docker-compose-up",
+         "group": "pre-push",
+         "command": "docker-compose",
+         "args": [
+            "up",
+            "-d",
+            "--build"
+         ]
+      },
+      {
+         "name": "docker-health-check",
+         "group": "pre-push",
+         "command": "bash",
+         "args": [
+            "-c",
+            "sleep 10 && docker-compose ps"
+         ]
+      }
+   ]
+}

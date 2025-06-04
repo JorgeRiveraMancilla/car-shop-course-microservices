@@ -1,4 +1,4 @@
-﻿using Duende.IdentityServer.Models;
+using Duende.IdentityServer.Models;
 
 namespace IdentityService
 {
@@ -32,10 +32,10 @@ namespace IdentityService
                     ClientSecrets = { new Secret("secret".Sha256()) },
                     AllowedGrantTypes = GrantTypes.CodeAndClientCredentials,
                     RequirePkce = true,
-                    RedirectUris = { 
+                    RedirectUris = {
                         "http://localhost:3000/api/auth/callback/id-server"
                     },
-                    PostLogoutRedirectUris = { 
+                    PostLogoutRedirectUris = {
                         "http://localhost:3000"
                     },
                     AllowOfflineAccess = true,

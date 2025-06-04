@@ -52,7 +52,7 @@ namespace IdentityService
             builder.Services.ConfigureApplicationCookie(options =>
             {
                 options.Cookie.SameSite = SameSiteMode.Lax;
-                
+
                 if (builder.Environment.IsProduction())
                 {
                     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
@@ -61,7 +61,7 @@ namespace IdentityService
                 {
                     options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
                 }
-                
+
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
                 options.SlidingExpiration = true;
             });
@@ -88,9 +88,9 @@ namespace IdentityService
 
             app.UseStaticFiles();
             app.UseRouting();
-            
+
             app.UseCors();
-            
+
             app.UseIdentityServer();
             app.UseAuthorization();
 

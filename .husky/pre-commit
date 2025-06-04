@@ -1,0 +1,39 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🔄 Ejecutando pre-commit hooks..."
+
+echo "📦 Restaurando paquetes NuGet..."
+dotnet husky run --name restore-packages
+
+if [ $? -ne 0 ]; then
+    echo "❌ Error al restaurar paquetes. Commit cancelado."
+    exit 1
+fi
+
+echo "✨ Formateando archivos staged..."
+# Obtener archivos .cs en staged
+staged_files=$(git diff --cached --name-only --diff-filter=ACM | grep '\.cs$' || true)
+
+if [ -n "$staged_files" ]; then
+    echo "📝 Archivos a formatear:"
+    echo "$staged_files"
+    
+    # Formatear solo archivos staged
+    echo "$staged_files" | xargs dotnet format --include
+    
+    # Re-agregar archivos formateados al stage
+    echo "$staged_files" | xargs git add
+else
+    echo "ℹ️  No hay archivos .cs en staged para formatear."
+fi
+
+echo "🔧 Construyendo solución..."
+dotnet husky run --name build-solution
+
+if [ $? -eq 0 ]; then
+    echo "✅ Pre-commit hooks completados exitosamente!"
+else
+    echo "❌ Error en build. Commit cancelado."
+    exit 1
+fi

@@ -1,0 +1,49 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🚀 Ejecutando pre-push hooks..."
+
+echo "🔍 Analizando archivos no utilizados..."
+dotnet husky run --name analyze-unused-files
+
+if [ $? -ne 0 ]; then
+    echo "⚠️  Advertencia en análisis de archivos, pero continuando..."
+fi
+
+echo "🧪 Ejecutando tests unitarios..."
+dotnet husky run --name run-unit-tests
+
+if [ $? -ne 0 ]; then
+    echo "❌ Error en tests. Push cancelado."
+    exit 1
+fi
+
+echo "🐳 Verificando configuración de Docker Compose..."
+dotnet husky run --name docker-compose-check
+
+if [ $? -eq 0 ]; then
+    echo "🐳 Iniciando servicios con Docker Compose..."
+    dotnet husky run --name docker-compose-up
+    
+    if [ $? -eq 0 ]; then
+        echo "⏳ Esperando que los servicios estén listos..."
+        dotnet husky run --name docker-health-check
+        
+        echo "✅ Pre-push hooks completados exitosamente!"
+        echo ""
+        echo "🌐 Servicios disponibles:"
+        echo "  - Gateway: http://localhost:6001"
+        echo "  - Auction Service: http://localhost:7001"
+        echo "  - Search Service: http://localhost:7002"
+        echo "  - Identity Service: http://localhost:5001"
+        echo "  - RabbitMQ Management: http://localhost:15672"
+        echo ""
+        echo "💡 Usa 'docker-compose logs [service-name]' para ver logs específicos"
+    else
+        echo "❌ Error al iniciar Docker Compose. Push cancelado."
+        exit 1
+    fi
+else
+    echo "❌ Error en configuración de Docker Compose. Push cancelado."
+    exit 1
+fi
