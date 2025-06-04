@@ -4,6 +4,6 @@ namespace AuctionService.Entities
     {
         Live,
         Finish,
-        NotFulfilled
+        NotFulfilled,
     }
 }

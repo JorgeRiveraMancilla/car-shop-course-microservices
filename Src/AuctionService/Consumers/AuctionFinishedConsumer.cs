@@ -12,8 +12,10 @@ namespace AuctionService.Consumers
         public async Task Consume(ConsumeContext<AuctionFinished> context)
         {
             var auction =
-                await _dataContext.Auctions.FindAsync(context.Message.AuctionId)
-                ?? throw new Exception("Auction not found");
+                await _dataContext.Auctions.FindAsync(Guid.Parse(context.Message.AuctionId))
+                ?? throw new InvalidOperationException(
+                    $"Auction with ID {context.Message.AuctionId} not found."
+                );
 
             if (context.Message.ItemSold)
             {
@@ -21,14 +23,8 @@ namespace AuctionService.Consumers
                 auction.SoldAmount = context.Message.Amount;
             }
 
-            if (auction.ReservePrice < auction.SoldAmount)
-            {
-                auction.Status = Status.Finish;
-            }
-            else
-            {
-                auction.Status = Status.NotFulfilled;
-            }
+            auction.Status =
+                auction.SoldAmount > auction.ReservePrice ? Status.Finish : Status.NotFulfilled;
 
             await _dataContext.SaveChangesAsync();
         }

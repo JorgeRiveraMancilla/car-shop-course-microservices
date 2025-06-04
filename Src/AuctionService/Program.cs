@@ -1,31 +1,44 @@
+using AuctionService.Consumers;
 using AuctionService.Data;
+using AuctionService.Services;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
+using Polly;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-builder.Services.AddDbContext<DataContext>(opt =>
+builder.Services.AddDbContext<DataContext>(options =>
 {
-    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddMassTransit(x =>
 {
     x.AddEntityFrameworkOutbox<DataContext>(o =>
     {
         o.QueryDelay = TimeSpan.FromSeconds(10);
+
         o.UsePostgres();
         o.UseBusOutbox();
     });
 
+    x.AddConsumersFromNamespaceContaining<AuctionCreatedFaultConsumer>();
+
     x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("auction", false));
 
     x.UsingRabbitMq(
-        (context, configuration) =>
+        (context, cfg) =>
         {
-            configuration.Host(
+            cfg.UseMessageRetry(r =>
+            {
+                r.Handle<RabbitMqConnectionException>();
+                r.Interval(5, TimeSpan.FromSeconds(10));
+            });
+
+            cfg.Host(
                 builder.Configuration["RabbitMq:Host"],
                 "/",
                 h =>
@@ -35,12 +48,7 @@ builder.Services.AddMassTransit(x =>
                 }
             );
 
-            configuration.UseMessageRetry(r =>
-            {
-                r.Incremental(3, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(3));
-            });
-
-            configuration.ConfigureEndpoints(context);
+            cfg.ConfigureEndpoints(context);
         }
     );
 });
@@ -53,27 +61,22 @@ builder
         options.TokenValidationParameters.ValidateAudience = false;
         options.TokenValidationParameters.NameClaimType = "username";
     });
+builder.Services.AddGrpc();
 
 var app = builder.Build();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
+app.MapGrpcService<GrpcAuctionService>();
 
-var busControl = app.Services.GetRequiredService<IBusControl>();
-await busControl.StartAsync(new CancellationTokenSource(TimeSpan.FromMinutes(1)).Token);
+var retryPolicy = Policy
+    .Handle<NpgsqlException>()
+    .WaitAndRetry(5, retryAttempt => TimeSpan.FromSeconds(10));
 
-try
-{
-    using var scope = app.Services.CreateScope();
-    var context = scope.ServiceProvider.GetRequiredService<DataContext>();
-    await context.Database.MigrateAsync();
-    Seeder.SeedData(context);
-}
-catch (Exception ex)
-{
-    var logger = app.Services.GetRequiredService<ILogger<Program>>();
-    logger.LogError(ex, "An error occurred during migration");
-}
+retryPolicy.ExecuteAndCapture(() =>
+    Seeder.SeedData(app.Services.GetRequiredService<DataContext>())
+);
 
 app.Run();
