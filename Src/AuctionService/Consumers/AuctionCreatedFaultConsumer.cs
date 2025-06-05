@@ -7,7 +7,7 @@ namespace AuctionService.Consumers
     {
         public async Task Consume(ConsumeContext<Fault<AuctionCreated>> context)
         {
-            var exception = context.Message.Exceptions.First();
+            ExceptionInfo exception = context.Message.Exceptions.First();
 
             if (exception.ExceptionType == "System.ArgumentException")
             {

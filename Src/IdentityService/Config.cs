@@ -15,8 +15,7 @@ namespace IdentityService
             var clients = new List<Client>
             {
                 // Postman client
-                new Client
-                {
+                new() {
                     ClientId = "postman",
                     ClientName = "Postman",
                     AllowedScopes = { "openid", "profile", "auctionApp" },
@@ -25,8 +24,7 @@ namespace IdentityService
                     AllowedGrantTypes = { GrantType.ResourceOwnerPassword }
                 },
                 // NextApp client
-                new Client
-                {
+                new() {
                     ClientId = "nextApp",
                     ClientName = "NextApp",
                     ClientSecrets = { new Secret("secret".Sha256()) },

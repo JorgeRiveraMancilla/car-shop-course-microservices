@@ -1,4 +1,5 @@
 using AuctionService.Data;
+using AuctionService.Entities;
 using Contracts;
 using MassTransit;
 
@@ -10,7 +11,7 @@ namespace AuctionService.Consumers
 
         public async Task Consume(ConsumeContext<BidPlaced> context)
         {
-            var auction = await _dataContext.Auctions.FindAsync(
+            Auction? auction = await _dataContext.Auctions.FindAsync(
                 Guid.Parse(context.Message.AuctionId)
             );
 

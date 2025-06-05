@@ -48,6 +48,7 @@ services:
       retries: 10
 
   auction-service:
+    platform: linux/amd64
     container_name: auction_service
     image: jiriveramancilla/auction-service:latest
     build:

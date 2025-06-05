@@ -1,4 +1,5 @@
 using AuctionService.Data;
+using AuctionService.Entities;
 using Grpc.Core;
 
 namespace AuctionService.Services
@@ -10,11 +11,11 @@ namespace AuctionService.Services
             ServerCallContext context
         )
         {
-            var auction =
+            Auction auction =
                 await dbContext.Auctions.FindAsync(Guid.Parse(request.Id))
-                ?? throw new RpcException(new Status(StatusCode.NotFound, "Not found"));
+                ?? throw new RpcException(new Grpc.Core.Status(StatusCode.NotFound, "Not found"));
 
-            var response = new GrpcAuctionResponse
+            GrpcAuctionResponse response = new()
             {
                 Auction = new GrpcAuctionModel
                 {
