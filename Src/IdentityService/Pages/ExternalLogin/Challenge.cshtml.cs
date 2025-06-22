@@ -18,7 +18,9 @@ namespace IdentityService.Pages.ExternalLogin
         public IActionResult OnGet(string scheme, string? returnUrl)
         {
             if (string.IsNullOrEmpty(returnUrl))
+            {
                 returnUrl = "~/";
+            }
 
             // validate returnUrl - either it is a valid OIDC URL or back to a local page
             if (

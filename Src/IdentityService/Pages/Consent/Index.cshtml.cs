@@ -47,7 +47,9 @@ namespace IdentityService.Pages.Consent
             // validate return url is still valid
             var request = await _interaction.GetAuthorizationContextAsync(Input.ReturnUrl);
             if (request == null)
+            {
                 return RedirectToPage("/Home/Error/Index");
+            }
 
             ConsentResponse? grantedConsent = null;
 

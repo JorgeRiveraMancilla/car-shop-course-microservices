@@ -58,7 +58,9 @@ namespace IdentityService.Pages.Device
                 Input.UserCode ?? throw new ArgumentNullException(nameof(Input.UserCode))
             );
             if (request == null)
+            {
                 return RedirectToPage("/Home/Error/Index");
+            }
 
             ConsentResponse? grantedConsent = null;
 

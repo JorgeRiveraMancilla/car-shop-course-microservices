@@ -18,14 +18,14 @@ namespace AuctionService.Data
 
             modelBuilder
                 .Entity<Auction>()
-                .HasOne(a => a.Item)
-                .WithOne(i => i.Auction)
-                .HasForeignKey<Item>(i => i.AuctionId)
+                .HasOne(x => x.Item)
+                .WithOne(x => x.Auction)
+                .HasForeignKey<Item>(x => x.AuctionId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<Item>().HasIndex(i => i.AuctionId).IsUnique();
-            modelBuilder.Entity<Auction>().Navigation(a => a.Item).IsRequired();
-            modelBuilder.Entity<Item>().Navigation(i => i.Auction).IsRequired();
+            modelBuilder.Entity<Item>().HasIndex(x => x.AuctionId).IsUnique();
+            modelBuilder.Entity<Auction>().Navigation(x => x.Item).IsRequired();
+            modelBuilder.Entity<Item>().Navigation(x => x.Auction).IsRequired();
         }
     }
 }

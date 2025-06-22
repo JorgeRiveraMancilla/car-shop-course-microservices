@@ -28,7 +28,9 @@ namespace SearchService.Consumers
                 .ExecuteAsync();
 
             if (!result.IsAcknowledged)
+            {
                 throw new MessageException(typeof(AuctionUpdated), "Problem updating auction");
+            }
         }
     }
 }
