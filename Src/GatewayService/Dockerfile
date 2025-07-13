@@ -1,26 +1,22 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /Src
-EXPOSE 80
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
 
-# Copy csproj and restore as distinct layers
-COPY car-shop-course-microservices.sln car-shop-course-microservices.sln
-COPY Src/AuctionService/AuctionService.csproj Src/AuctionService/AuctionService.csproj
-COPY Src/SearchService/SearchService.csproj Src/SearchService/SearchService.csproj
-COPY Src/GatewayService/GatewayService.csproj Src/GatewayService/GatewayService.csproj
-COPY Src/Contracts/Contracts.csproj Src/Contracts/Contracts.csproj
-COPY Src/IdentityService/IdentityService.csproj Src/IdentityService/IdentityService.csproj
+# Copy solution file and project files
+COPY car-shop-course-microservices.sln .
+COPY Src/GatewayService/GatewayService.csproj ./Src/GatewayService/
 
 # Restore packages
-RUN dotnet restore car-shop-course-microservices.sln
+RUN dotnet restore Src/GatewayService/GatewayService.csproj
 
-# Copy the app folders
-COPY Src/GatewayService Src/GatewayService
+# Copy source code
+COPY Src/GatewayService/ ./Src/GatewayService/
 
-# Publish the app
-RUN dotnet publish "Src/GatewayService/GatewayService.csproj" -c Release -o /app/Src/out
+# Build and publish
+RUN dotnet publish Src/GatewayService/GatewayService.csproj -c Release -o /app/publish
 
-# Build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 WORKDIR /app
-COPY --from=build /app/Src/out .
-ENTRYPOINT [ "dotnet", "GatewayService.dll" ]
+EXPOSE 80
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "GatewayService.dll"]
